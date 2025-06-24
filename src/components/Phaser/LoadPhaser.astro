@@ -4,6 +4,8 @@ import Phaser from 'phaser';
     type: Phaser.AUTO,
     width: 800,
     height: 600,
+    parent:"game-container",
+    id: "game-canvas",
     physics: {
       default: 'arcade',
       arcade: {
@@ -733,4 +735,3 @@ import Phaser from 'phaser';
   }
 </script>
 
-<div id="phaser-1" style="margin-bottom:2em"></div>
