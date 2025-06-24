@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "astro": "^5.9.3",
+    "nanostores": "^1.0.1",
     "phaser": "^3.90.0"
   }
 }
