@@ -1,5 +1,7 @@
-<div>
+
+<div class="gameOverlay">
 <h2>Game Started <span id="test">False</span></h2>
+<button id="testButton">Test</button>
 </div>
 
 <script>
@@ -11,9 +13,23 @@
 
     }
   })
+ 
+function startGame(){
+  gameStarted.set(true);
+}
+
+document.getElementById('testButton')?.addEventListener('click', startGame)
 </script>
 
 <style>
+
+  .gameOverlay{
+    width: 800px;
+    height: 600px;
+    border:1px solid white;
+    position: absolute;
+    /* z-index: 5; */
+  }
   h2 {
     color:white;
   }

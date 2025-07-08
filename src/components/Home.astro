@@ -4,21 +4,14 @@ import Test from "./Test.astro"
 ---
 
 <div class="wrapper">
+  <Test />
   <div id="game-container">
-    <button id="testButton">Test</button>
-    <Test />
+    
     <LoadPhaser />
   </div>
 </div>
 
-<script>
-  import {gameStarted} from '../store'
-function startGame(){
-  gameStarted.set(true);
-}
 
-document.getElementById('testButton')?.addEventListener('click', startGame)
-</script>
 
 
 <style>
@@ -32,5 +25,9 @@ document.getElementById('testButton')?.addEventListener('click', startGame)
   }
   #game-container{
    display: inline-block;
+  }
+
+  #testButton{
+    z-index: 5;
   }
 </style>
