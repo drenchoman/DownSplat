@@ -1,0 +1,20 @@
+<div>
+<h2>Game Started <span id="test">False</span></h2>
+</div>
+
+<script>
+  import { gameStarted } from "../store";
+  gameStarted.subscribe(started => {
+    if (started){
+      document.getElementById('test').textContent = "True"
+    } else {
+
+    }
+  })
+</script>
+
+<style>
+  h2 {
+    color:white;
+  }
+</style>

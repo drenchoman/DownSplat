@@ -1,11 +1,24 @@
 ---
 import LoadPhaser from "./Phaser/LoadPhaser.astro"
+import Test from "./Test.astro"
 ---
+
 <div class="wrapper">
   <div id="game-container">
+    <button id="testButton">Test</button>
+    <Test />
     <LoadPhaser />
   </div>
 </div>
+
+<script>
+  import {gameStarted} from '../store'
+function startGame(){
+  gameStarted.set(true);
+}
+
+document.getElementById('testButton')?.addEventListener('click', startGame)
+</script>
 
 
 <style>
