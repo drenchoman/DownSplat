@@ -1,5 +1,5 @@
 
-<div class="gameOverlay">
+<div id="gameOverlay">
 <h2>Game Started <span id="test">False</span></h2>
 <button id="testButton">Test</button>
 </div>
@@ -9,9 +9,9 @@
   gameStarted.subscribe(started => {
     if (started){
       document.getElementById('test').textContent = "True"
+      document.getElementById('gameOverlay').classList.add('hide')
     } else {
-
-    }
+      document.getElementById('gameOverlay')?.classList.remove('hide')    }
   })
  
 function startGame(){
@@ -23,12 +23,16 @@ document.getElementById('testButton')?.addEventListener('click', startGame)
 
 <style>
 
-  .gameOverlay{
+  #gameOverlay{
     width: 800px;
     height: 600px;
     border:1px solid white;
     position: absolute;
     /* z-index: 5; */
+  }
+
+  .hide{
+    display: none;
   }
   h2 {
     color:white;

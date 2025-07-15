@@ -543,6 +543,7 @@ gameStarted.subscribe(started => {
   }
   function setGameOver(scene) {
     scene.physics.pause();
+    
 
     player1.anims.pause(); // Stop animations
     player2.anims.pause();
@@ -560,6 +561,8 @@ gameStarted.subscribe(started => {
         }
       )
       .setOrigin(0.5); // center align
+
+      gameStarted.set(false)
   }
 
   function updateLives(player) {
