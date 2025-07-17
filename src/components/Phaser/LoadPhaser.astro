@@ -1,5 +1,5 @@
 <script>
-import { gameStarted } from '../../store';
+import { gameStarted, gameFinished } from '../../store';
 import Phaser from 'phaser';
   var config = {
     type: Phaser.AUTO,
@@ -23,35 +23,33 @@ import Phaser from 'phaser';
 
   var player1;
   var player2;
-  var stars;
-  var bombs;
-  var platforms;
   var p1Controls;
   var p2Controls;
-  var score = 0;
   var gameOver = false;
-  var scoreText;
   var p1Lives;
   var p2Lives;
-  var platformTest;
   var ground;
   var roof;
   var velocity = 60;
   var initalGravity = 200;
-  var growPlatform;
-  // var playerOne = {
-  //   slowPlatform: false,
-  //   fastPlatform: false,
-  //   big: false,
-  //   small: false,
-  //   regular: true,
-  // };
+  var score = 0;
+  var scoreText;
+  var game 
+
 gameStarted.subscribe(started => {
   if(started){
-    var game = new Phaser.Game(config);
+    game = new Phaser.Game(config);
 
+  } 
+    
+})
+
+gameFinished.subscribe(finished => {
+  if(finished == false){
+   resetLives(player1, player2)
   }
 })
+
 
   function preload() {
     this.load.image('sky', 'phaser/assets/sky.png');
@@ -561,8 +559,10 @@ gameStarted.subscribe(started => {
         }
       )
       .setOrigin(0.5); // center align
+      
+      setTimeout(function(){gameFinished.set(true)}, 2000)
+     
 
-      gameStarted.set(false)
   }
 
   function updateLives(player) {
@@ -576,6 +576,13 @@ gameStarted.subscribe(started => {
     if (player.lives == 0) {
       gameOver = true;
     }
+  }
+
+  function resetLives(player1, player2){
+    player1.lives = 3;
+    player2.lives = 3;
+    gameOver = false;
+
   }
 
   // function updateScore() {
@@ -612,6 +619,7 @@ gameStarted.subscribe(started => {
     });
   }
 
+
   function respawnPlayer(playerObj, x, y, tint = null) {
     playerObj.dead = false;
 
@@ -643,6 +651,11 @@ gameStarted.subscribe(started => {
 
     resetPlayerPhysics(playerObj);
   }
+
+  function restartGame(){
+    resetLives();
+  }
+
 
   function bounce(player, bouncyPlatform) {
     if (

@@ -1,24 +1,43 @@
 
 <div id="gameOverlay">
-<h2>Game Started <span id="test">False</span></h2>
-<button id="testButton">Test</button>
+  <div class="init-wrapper">
+
+<button id="onePlayer">One Player</button>
+<button id="twoPlayer">Two Player</button>
+<button id="threePlayer">Three Player</button>
+</div>
+<div class="play-again-wrapper hide">
+  <button id="playAgain">Play Again</button>
+</div>
+
 </div>
 
 <script>
-  import { gameStarted } from "../store";
+  import { gameStarted, gameFinished } from "../store";
   gameStarted.subscribe(started => {
     if (started){
-      document.getElementById('test').textContent = "True"
-      document.getElementById('gameOverlay').classList.add('hide')
+      document.querySelector('.init-wrapper')?.classList.add('hide')
     } else {
-      document.getElementById('gameOverlay')?.classList.remove('hide')    }
+      document.getElementById('init-wrapper')?.classList.remove('hide')    }
+  })
+  gameFinished.subscribe(finished => {
+    if (finished){
+      document.querySelector(".init-wrapper")?.classList.add('hide')
+      document.querySelector('.play-again-wrapper')?.classList.remove('hide')
+    }
   })
  
 function startGame(){
   gameStarted.set(true);
 }
+function restartGame(){
+  gameFinished.set(false)
+}
 
-document.getElementById('testButton')?.addEventListener('click', startGame)
+document.getElementById('onePlayer')?.addEventListener('click', startGame)
+document.getElementById('twoPlayer')?.addEventListener('click', startGame)
+document.getElementById('threePlayer')?.addEventListener("click", startGame)
+document.getElementById('playAgain')?.addEventListener("click", restartGame)
 </script>
 
 <style>
