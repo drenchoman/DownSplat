@@ -22,8 +22,10 @@
   })
   gameFinished.subscribe(finished => {
     if (finished){
-      document.querySelector(".init-wrapper")?.classList.add('hide')
       document.querySelector('.play-again-wrapper')?.classList.remove('hide')
+    } else {
+            document.querySelector('.play-again-wrapper')?.classList.add('hide')
+
     }
   })
  

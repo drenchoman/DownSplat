@@ -44,11 +44,11 @@ gameStarted.subscribe(started => {
     
 })
 
-gameFinished.subscribe(finished => {
-  if(finished == false){
-   resetLives(player1, player2)
-  }
-})
+// gameFinished.subscribe(finished => {
+//   if(finished == false){
+//    resetLives(player1, player2)
+//   }
+// })
 
 
   function preload() {
@@ -274,6 +274,15 @@ gameFinished.subscribe(finished => {
   function update() {
     const p1Larger = player1.size > player2.size;
     const p2Larger = player2.size > player1.size;
+
+    // Restarts the game
+    gameFinished.subscribe(finished => {
+      if(finished == false){
+        if(gameOver == true){
+        restartGame(this)
+        }
+      }
+    })
 
     // Determine contact points
     const touching = {
@@ -515,10 +524,14 @@ gameFinished.subscribe(finished => {
     }
     resetPlayerSizeIfNeeded.call(this, player1);
     resetPlayerSizeIfNeeded.call(this, player2);
+  
+       if (gameOver) {
 
-    if (gameOver) {
       setGameOver(this);
+      
     }
+    
+   
 
     function handlePlayerControls(player, controls, speed) {
       if (player.dead) return;
@@ -543,8 +556,8 @@ gameFinished.subscribe(finished => {
     scene.physics.pause();
     
 
-    player1.anims.pause(); // Stop animations
-    player2.anims.pause();
+    // player1.anims.pause(); 
+    // player2.anims.pause();
 
     // Optional: Disable input
     scene.add
@@ -560,7 +573,7 @@ gameFinished.subscribe(finished => {
       )
       .setOrigin(0.5); // center align
       
-      setTimeout(function(){gameFinished.set(true)}, 2000)
+      // setTimeout(function(){gameFinished.set(true)}, 2000)
      
 
   }
@@ -575,6 +588,7 @@ gameFinished.subscribe(finished => {
     }
     if (player.lives == 0) {
       gameOver = true;
+      gameFinished.set(true);
     }
   }
 
@@ -652,8 +666,8 @@ gameFinished.subscribe(finished => {
     resetPlayerPhysics(playerObj);
   }
 
-  function restartGame(){
-    resetLives();
+  function restartGame(scene){
+      scene.scene.restart()
   }
 
 

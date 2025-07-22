@@ -5,3 +5,4 @@ export const twoPlayer = atom(false);
 export const threePlayer = atom(false);
 export const onePlayer = atom(false);
 export const gameFinished = atom(false);
+export const gameOver = atom(false);
