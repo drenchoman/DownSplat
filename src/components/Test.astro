@@ -1,8 +1,8 @@
 
 <div id="gameOverlay">
-  <div class="player-one-lives"><h2>P1 Lives</h2></div>
-  <div class="player-two-lives"><h2>P2 Lives</h2></div>
-  <div class="player-three-lives"><h2>P3 Lives</h2></div>
+  <div class="player-one-lives"><h2>P1 Lives <span class="p1-lives-text"></span></h2></div>
+  <div class="player-two-lives"><h2>P2 Lives <span class="p2-lives-text"></span></h2></div>
+  <div class="player-three-lives"><h2>P3 Lives <span class="p3-lives-text"></span></h2></div>
 
   <div class="init-wrapper">
 
@@ -17,7 +17,7 @@
 </div>
 
 <script>
-  import { gameStarted, gameFinished } from "../store";
+  import { gameStarted, gameFinished, p1LivesText, p2LivesText, p3LivesText } from "../store";
   gameStarted.subscribe(started => {
     if (started){
       document.querySelector('.init-wrapper')?.classList.add('hide')
@@ -32,6 +32,16 @@
 
     }
   })
+// Update Lives
+  p1LivesText.subscribe(lives => {
+    document.querySelector('.p1-lives-text').innerHTML = lives;
+  })
+
+  p2LivesText.subscribe(lives => {
+    document.querySelector('.p2-lives-text').innerHTML = lives;
+  })
+  
+
  
 function startGame(){
   gameStarted.set(true);

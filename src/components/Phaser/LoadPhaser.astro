@@ -1,5 +1,5 @@
 <script>
-import { gameStarted, gameFinished } from '../../store';
+import { gameStarted, gameFinished, p1LivesText, p2LivesText, p3LivesText } from '../../store';
 import Phaser from 'phaser';
   var config = {
     type: Phaser.AUTO,
@@ -581,10 +581,12 @@ gameStarted.subscribe(started => {
   function updateLives(player) {
     if (player == player1) {
       p1Lives.setText('P1 Lives: ' + player.lives);
+      p1LivesText.set(player.lives)
     }
 
     if (player == player2) {
       p2Lives.setText('P2 Lives: ' + player.lives);
+      p2LivesText.set(player.lives);
     }
     if (player.lives == 0) {
       gameOver = true;
@@ -667,6 +669,9 @@ gameStarted.subscribe(started => {
   }
 
   function restartGame(scene){
+    p1LivesText.set(3)
+    p2LivesText.set(3);
+    p3LivesText.set(3);
       scene.scene.restart()
   }
 
