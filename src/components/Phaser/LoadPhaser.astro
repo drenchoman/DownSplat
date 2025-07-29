@@ -252,6 +252,30 @@ gameStarted.subscribe(started => {
     }
     spawnPlatform(this);
 
+     function restartGame(scene){
+      gameOver = false;
+    p1LivesText.set(3)
+    p2LivesText.set(3);
+    p3LivesText.set(3);
+      scene.scene.restart()
+     }
+
+   
+
+
+       // Restarts the game
+    gameFinished.subscribe(finished => {
+      if(finished == false && gameOver == true){
+        
+        restartGame(this)
+        
+      }
+    })
+
+  }
+  
+
+
     // Update score 1 PLAYER //
     // this.time.addEvent({
     //   delay: 1000, // 1000 ms = 1 second
@@ -269,20 +293,13 @@ gameStarted.subscribe(started => {
 
     // this.physics.add.collider(player1, testFloor);
     // this.physics.add.collider(player2, testFloor);
-  }
+  
 
   function update() {
     const p1Larger = player1.size > player2.size;
     const p2Larger = player2.size > player1.size;
 
-    // Restarts the game
-    gameFinished.subscribe(finished => {
-      if(finished == false){
-        if(gameOver == true){
-        restartGame(this)
-        }
-      }
-    })
+  
 
     // Determine contact points
     const touching = {
@@ -552,6 +569,9 @@ gameStarted.subscribe(started => {
     handlePlayerControls(player1, p1Controls, player1Speed);
     handlePlayerControls(player2, p2Controls, player2Speed);
   }
+
+   
+
   function setGameOver(scene) {
     scene.physics.pause();
     
@@ -578,14 +598,16 @@ gameStarted.subscribe(started => {
 
   }
 
+
+
   function updateLives(player) {
     if (player == player1) {
-      p1Lives.setText('P1 Lives: ' + player.lives);
+      // p1Lives.setText('P1 Lives: ' + player.lives);
       p1LivesText.set(player.lives)
     }
 
     if (player == player2) {
-      p2Lives.setText('P2 Lives: ' + player.lives);
+      // p2Lives.setText('P2 Lives: ' + player.lives);
       p2LivesText.set(player.lives);
     }
     if (player.lives == 0) {
@@ -668,13 +690,7 @@ gameStarted.subscribe(started => {
     resetPlayerPhysics(playerObj);
   }
 
-  function restartGame(scene){
-    p1LivesText.set(3)
-    p2LivesText.set(3);
-    p3LivesText.set(3);
-      scene.scene.restart()
-  }
-
+ 
 
   function bounce(player, bouncyPlatform) {
     if (
