@@ -1,8 +1,10 @@
 
 <div id="gameOverlay">
-  <div class="player-one-lives"><h2>P1 Lives <span class="p1-lives-text"></span></h2></div>
-  <div class="player-two-lives"><h2>P2 Lives <span class="p2-lives-text"></span></h2></div>
-  <div class="player-three-lives"><h2>P3 Lives <span class="p3-lives-text"></span></h2></div>
+  <div class="livesOverlay hide">
+  <div class="player-one-lives"><h2>P1 Lives <br/> <span class="p1-lives-text"></span></h2></div>
+  <div class="player-two-lives"><h2>P2 Lives <br/><span class="p2-lives-text"></span></h2></div>
+  <div class="player-three-lives"><h2>P3 Lives <br/> <span class="p3-lives-text"></span></h2></div>
+  </div>
 
   <div class="init-wrapper">
 
@@ -21,6 +23,7 @@
   gameStarted.subscribe(started => {
     if (started){
       document.querySelector('.init-wrapper')?.classList.add('hide')
+      document.querySelector('.livesOverlay')?.classList.remove('hide')
     } else {
       document.getElementById('init-wrapper')?.classList.remove('hide')    }
   })
@@ -34,11 +37,13 @@
   })
 // Update Lives
   p1LivesText.subscribe(lives => {
-    document.querySelector('.p1-lives-text').innerHTML = lives;
+    const hearts = '❤️'.repeat(lives);
+    document.querySelector('.p1-lives-text').innerHTML = hearts;
   })
 
   p2LivesText.subscribe(lives => {
-    document.querySelector('.p2-lives-text').innerHTML = lives;
+    const hearts = '❤️'.repeat(lives);
+    document.querySelector('.p2-lives-text').innerHTML = hearts;
   })
   
 
