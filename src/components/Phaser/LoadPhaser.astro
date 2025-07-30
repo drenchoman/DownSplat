@@ -1,5 +1,5 @@
 <script>
-import { gameStarted, gameFinished, p1LivesText, p2LivesText, p3LivesText } from '../../store';
+import { gameStarted, gameFinished, p1LivesText, p2LivesText, p3LivesText, numberOfPlayers } from '../../store';
 import Phaser from 'phaser';
   var config = {
     type: Phaser.AUTO,
@@ -117,10 +117,27 @@ gameStarted.subscribe(started => {
       if (tint) player.setTint(tint);
       return player;
     }
+    const playerTints = [null, 0x00ff00, 0xeeffee]; // Define tints if you want variety
+    const playerPositions = [300, 500, 400];
+    let players = [];
 
-   player1 = createPlayer(this, 300, 50);
-   player2 = createPlayer(this, 500, 50, 0x00ff00);
-   player3 = createPlayer(this, 400, 50, 0xeeffee);
+    numberOfPlayers.subscribe(numOfPlayers => {
+      players = [];
+
+    for( let i = 0; i < numOfPlayers; i++){
+      const x = playerPositions[i] || 400;
+      const tint = playerTints[i] || null;
+      const player = createPlayer(this,x, 50, tint);
+      players.push(player)
+    }
+      [player1,player2,player3]= players;
+  })
+  
+  
+
+  //  player1 = createPlayer(this, 300, 50);
+  //  player2 = createPlayer(this, 400, 50, 0x00ff00);
+  //  player3 = createPlayer(this, 500, 50, 0xeeffee);
 
     //  Our player animations, turning, walking left and walking right.
     this.anims.create({
@@ -299,33 +316,35 @@ gameStarted.subscribe(started => {
   
 
   function update() {
-    const p1Larger = player1.size > player2.size || player1.size > player3.size;
-    const p2Larger = player2.size > player1.size || player2.size > player3.size;
-    const p3Larger = player3.size > player1.size || player3.size > player2.size;
+   const p1Larger = player1.size > player2?.size || player1.size > player3?.size;
+const p2Larger = player2?.size > player1.size || player2?.size > player3?.size;
+const p3Larger = player3?.size > player1.size || player3?.size > player2.size;
+
 
 
   
 
     // Determine contact points
-    const touching = {
+const touching = {
   // Player 1 ↔ Player 2
-  p1RightP2: player1.body.touching.right && player2.body.touching.left,
-  p1LeftP2:  player1.body.touching.left  && player2.body.touching.right,
-  p1AboveP2: player1.body.touching.down  && player2.body.touching.up,
-  p2AboveP1: player2.body.touching.down  && player1.body.touching.up,
+  p1RightP2: player1?.body?.touching?.right && player2?.body?.touching?.left,
+  p1LeftP2:  player1?.body?.touching?.left  && player2?.body?.touching?.right,
+  p1AboveP2: player1?.body?.touching?.down  && player2?.body?.touching?.up,
+  p2AboveP1: player2?.body?.touching?.down  && player1?.body?.touching?.up,
 
   // Player 1 ↔ Player 3
-  p1RightP3: player1.body.touching.right && player3.body.touching.left,
-  p1LeftP3:  player1.body.touching.left  && player3.body.touching.right,
-  p1AboveP3: player1.body.touching.down  && player3.body.touching.up,
-  p3AboveP1: player3.body.touching.down  && player1.body.touching.up,
+  p1RightP3: player1?.body?.touching?.right && player3?.body?.touching?.left,
+  p1LeftP3:  player1?.body?.touching?.left  && player3?.body?.touching?.right,
+  p1AboveP3: player1?.body?.touching?.down  && player3?.body?.touching?.up,
+  p3AboveP1: player3?.body?.touching?.down  && player1?.body?.touching?.up,
 
   // Player 2 ↔ Player 3
-  p2RightP3: player2.body.touching.right && player3.body.touching.left,
-  p2LeftP3:  player2.body.touching.left  && player3.body.touching.right,
-  p2AboveP3: player2.body.touching.down  && player3.body.touching.up,
-  p3AboveP2: player3.body.touching.down  && player2.body.touching.up,
+  p2RightP3: player2?.body?.touching?.right && player3?.body?.touching?.left,
+  p2LeftP3:  player2?.body?.touching?.left  && player3?.body?.touching?.right,
+  p2AboveP3: player2?.body?.touching?.down  && player3?.body?.touching?.up,
+  p3AboveP2: player3?.body?.touching?.down  && player2?.body?.touching?.up,
 };
+
 
     // Reset platform type if not standing on one
     [player1, player2, player3].forEach((player) => {

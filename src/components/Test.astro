@@ -29,7 +29,7 @@
 </div>
 
 <script>
-  import { gameStarted, gameFinished, p1LivesText, p2LivesText, p3LivesText } from "../store";
+  import { gameStarted, gameFinished, p1LivesText, p2LivesText, p3LivesText, numberOfPlayers } from "../store";
   gameStarted.subscribe(started => {
     if (started){
       document.querySelector('.init-wrapper')?.classList.add('hide')
@@ -62,7 +62,21 @@
   })
   
 
- 
+ function startSinglePlayer(){
+  numberOfPlayers.set(1);
+  startGame()
+
+ }
+ function startTwoPlayer(){
+  numberOfPlayers.set(2);
+  startGame()
+
+ }
+ function startThreePlayer(){
+  numberOfPlayers.set(3)
+  startGame()
+
+ }
 function startGame(){
   gameStarted.set(true);
 }
@@ -70,9 +84,9 @@ function restartGame(){
   gameFinished.set(false);
 }
 
-document.getElementById('onePlayer')?.addEventListener('click', startGame)
-document.getElementById('twoPlayer')?.addEventListener('click', startGame)
-document.getElementById('threePlayer')?.addEventListener("click", startGame)
+document.getElementById('onePlayer')?.addEventListener('click', startSinglePlayer)
+document.getElementById('twoPlayer')?.addEventListener('click', startTwoPlayer)
+document.getElementById('threePlayer')?.addEventListener("click", startThreePlayer)
 document.getElementById('playAgain')?.addEventListener("click", restartGame)
 </script>
 
