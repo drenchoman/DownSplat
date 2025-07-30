@@ -316,319 +316,246 @@ gameStarted.subscribe(started => {
   
 
   function update() {
-   const p1Larger = player1.size > player2?.size || player1.size > player3?.size;
-const p2Larger = player2?.size > player1.size || player2?.size > player3?.size;
-const p3Larger = player3?.size > player1.size || player3?.size > player2.size;
+ const players = [player1, player2, player3].filter(p => !!p);
 
+  const sizeOrZero = (p) => p?.size ?? 0;
 
+  const p1Larger = player1
+    && player1.size > sizeOrZero(player2)
+    && player1.size > sizeOrZero(player3);
 
-  
+  const p2Larger = player2
+    && player2.size > sizeOrZero(player1)
+    && player2.size > sizeOrZero(player3);
 
-    // Determine contact points
-const touching = {
-  // Player 1 ↔ Player 2
-  p1RightP2: player1?.body?.touching?.right && player2?.body?.touching?.left,
-  p1LeftP2:  player1?.body?.touching?.left  && player2?.body?.touching?.right,
-  p1AboveP2: player1?.body?.touching?.down  && player2?.body?.touching?.up,
-  p2AboveP1: player2?.body?.touching?.down  && player1?.body?.touching?.up,
+  const p3Larger = player3
+    && player3.size > sizeOrZero(player1)
+    && player3.size > sizeOrZero(player2);
 
-  // Player 1 ↔ Player 3
-  p1RightP3: player1?.body?.touching?.right && player3?.body?.touching?.left,
-  p1LeftP3:  player1?.body?.touching?.left  && player3?.body?.touching?.right,
-  p1AboveP3: player1?.body?.touching?.down  && player3?.body?.touching?.up,
-  p3AboveP1: player3?.body?.touching?.down  && player1?.body?.touching?.up,
+  // Touching pairs with optional chaining
+  const touching = {
+    p1AboveP2: player1?.body?.touching?.down && player2?.body?.touching?.up,
+    p1AboveP3: player1?.body?.touching?.down && player3?.body?.touching?.up,
+    p2AboveP1: player2?.body?.touching?.down && player1?.body?.touching?.up,
+    p2AboveP3: player2?.body?.touching?.down && player3?.body?.touching?.up,
+    p3AboveP1: player3?.body?.touching?.down && player1?.body?.touching?.up,
+    p3AboveP2: player3?.body?.touching?.down && player2?.body?.touching?.up,
+  };
 
-  // Player 2 ↔ Player 3
-  p2RightP3: player2?.body?.touching?.right && player3?.body?.touching?.left,
-  p2LeftP3:  player2?.body?.touching?.left  && player3?.body?.touching?.right,
-  p2AboveP3: player2?.body?.touching?.down  && player3?.body?.touching?.up,
-  p3AboveP2: player3?.body?.touching?.down  && player2?.body?.touching?.up,
-};
-
-
-    // Reset platform type if not standing on one
-    [player1, player2, player3].forEach((player) => {
-      if (!player.body.touching.down) {
-        player.currentPlatformType = null;
-      }
-    });
-
-    // Handle crush logic
-   if (touching.p1AboveP2 && p1Larger) {
-  playerLose(player2, null, this);
-} else if (touching.p1AboveP3 && p1Larger) {
-  playerLose(player3, null, this);
-}
-
-// Player 2 crushes Player 1 or Player 3
-if (touching.p2AboveP1 && p2Larger) {
-  playerLose(player1, null, this);
-} else if (touching.p2AboveP3 && p2Larger) {
-  playerLose(player3, null, this);
-}
-
-// Player 3 crushes Player 1 or Player 2
-if (touching.p3AboveP1 && p3Larger) {
-  playerLose(player1, null, this);
-} else if (touching.p3AboveP2 && p3Larger) {
-  playerLose(player2, null, this);
-}
-
-    function handleUngrow(player, growPlatform, scene) {
-      const isOnGrowPlatform =
-        player.body.touching.down &&
-        growPlatform.body.touching.up;
-
-      if (
-        !isOnGrowPlatform &&
-        player.scaleX > 1 &&
-        !player.ungrowTimeStarted
-      ) {
-        player.ungrowTimeStarted = true;
-
-        scene.time.delayedCall(10000, () => {
-          const stillOffGrowPlatform = !(
-            player.body.touching.down &&
-            growPlatform.body.touching.up
-          );
-
-          if (stillOffGrowPlatform && player.scaleX > 1) {
-            scene.tweens.add({
-              targets: player,
-              scaleX: 1,
-              scaleY: 1,
-              duration: 500,
-              ease: 'Power2',
-              onComplete: () => {
-                player.body.setSize(
-                  player.displayWidth,
-                  player.displayHeight,
-                  true
-                );
-                resetPlayerPhysics(player);
-                player.ungrowTimeStarted = false;
-              },
-            });
-          } else {
-            player.ungrowTimeStarted = false;
-          }
-        });
-      }
+  // Reset platform type for players not standing on one
+  players.forEach(player => {
+    if (!player.body.touching.down) {
+      player.currentPlatformType = null;
     }
-    function handleUngrowForPlayer(player, scene) {
-      scene.platforms.getChildren().forEach((platform) => {
-        if (platform.effect === 'grow') {
-          handleUngrow(player, platform, scene);
-        }
-      });
-    }
-    handleUngrowForPlayer(player1, this);
-    handleUngrowForPlayer(player2, this);
-    handleUngrowForPlayer(player3, this);
+  });
 
-    function handleUnshrink(player, shrinkPlatform, scene) {
-      const isOnShrinkPlatform =
-        player.body.touching.down &&
-        shrinkPlatform.body.touching.up;
+  // Helper for crush check
+  function canCrush(attacker, defender) {
+    return attacker && defender && attacker.size > defender.size;
+  }
 
-      if (
-        !isOnShrinkPlatform &&
-        player.scaleX < 1 &&
-        !player.unshrinkTimerStarted
-      ) {
-        player.unshrinkTimerStarted = true;
+  // Crush logic — only crush if touching and attacker is larger
+  if (touching.p1AboveP2 && canCrush(player1, player2)) playerLose(player2, null, this);
+  if (touching.p1AboveP3 && canCrush(player1, player3)) playerLose(player3, null, this);
 
-        scene.time.delayedCall(10000, () => {
-          const stillOffShrinkPlatform = !(
-            player.body.touching.down &&
-            shrinkPlatform.body.touching.up
-          );
+  if (touching.p2AboveP1 && canCrush(player2, player1)) playerLose(player1, null, this);
+  if (touching.p2AboveP3 && canCrush(player2, player3)) playerLose(player3, null, this);
 
-          if (stillOffShrinkPlatform && player.scaleX < 1) {
-            scene.tweens.add({
-              targets: player,
-              scaleX: 1,
-              scaleY: 1,
-              duration: 500,
-              ease: 'Power2',
-              onComplete: () => {
-                player.body.setSize(
-                  player.displayWidth,
-                  player.displayHeight,
-                  true
-                );
-                resetPlayerPhysics(player);
-                player.unshrinkTimerStarted = false;
-              },
-            });
-          } else {
-            player.unshrinkTimerStarted = false;
-          }
-        });
-      }
-    }
-    function handleUnshrinkForPlayer(player, scene) {
-      scene.platforms.getChildren().forEach((platform) => {
-        if (platform.effect === 'shrink') {
-          handleUnshrink(player, platform, scene);
-        }
-      });
-    }
-    handleUnshrinkForPlayer(player1, this);
-    handleUnshrinkForPlayer(player2, this);
-    handleUnshrinkForPlayer(player3, this);
+  if (touching.p3AboveP1 && canCrush(player3, player1)) playerLose(player1, null, this);
+  if (touching.p3AboveP2 && canCrush(player3, player2)) playerLose(player2, null, this);
 
-    function handleCloudPlatformInteraction(
-      player,
-      cloudPlatform,
-      scene
-    ) {
-      const isOnCloudPlatform =
-        player.body.touching.down &&
-        cloudPlatform.body.touching.up;
+  function handleUngrow(player, growPlatform, scene) {
+    const isOnGrowPlatform = player.body.touching.down && growPlatform.body.touching.up;
 
-      if (
-        isOnCloudPlatform &&
-        (player.size === 2 || player.size === 3)
-      ) {
-        const duration = player.size === 2 ? 2000 : 1000;
-
-        scene.tweens.add({
-          targets: cloudPlatform,
-          alpha: 0,
-          duration: duration,
-          ease: 'Linear',
-          onComplete: () => {
-            const newX = Phaser.Math.Between(-50, 850); // random x within screen
-            const newY = 650 + Phaser.Math.Between(0, 200);
-            cloudPlatform.disableBody(true, true);
-            cloudPlatform.enableBody(
-              true,
-              newX,
-              newY,
-              true,
-              true
-            );
-            cloudPlatform.setAlpha(1);
-            cloudPlatform.setVelocityY(-velocity);
-          },
-        });
-      }
-    }
-    function handleCloudPlatformForPlayer(player, scene) {
-      scene.platforms.getChildren().forEach((platform) => {
-        if (platform.effect === 'cloud') {
-          handleCloudPlatformInteraction(player, platform, scene);
-        }
-      });
-    }
-    handleCloudPlatformForPlayer(player1, this);
-    handleCloudPlatformForPlayer(player2, this);
-    handleCloudPlatformForPlayer(player3, this);
-
-    function updatePlayerSpeed({
-      scene,
-      controls,
-      player,
-      touching,
-      isLarger,
-    }) {
-      let speed = 200; // Default speed
-
-      const isOnFastPlatform =
-        player.currentPlatformType === 'fast';
-      const isOnSlowPlatform =
-        player.currentPlatformType === 'slow';
-
-      // Adjust based on platform type
-      if (isOnFastPlatform) {
-        if (controls.right.isDown) speed = 300;
-        else if (controls.left.isDown) speed = 100;
-      } else if (isOnSlowPlatform) {
-        if (controls.right.isDown) speed = 100;
-        else if (controls.left.isDown) speed = 300;
-      }
-
-      // Adjust based on collision and size
-      if ((touching.left || touching.right) && isLarger) {
-        speed *= 2;
-      }
-      // console.log(speed);
-      return speed;
-    }
-
-   var player1Speed = updatePlayerSpeed({
-      scene: this,
-      player: player1,
-      controls: p1Controls,
-      touching,
-      isLarger: p1Larger,
-    });
-   var player2Speed = updatePlayerSpeed({
-      scene: this,
-      player: player2,
-      controls: p2Controls,
-      touching,
-      isLarger: p2Larger,
-    });
-
-    var player3Speed = updatePlayerSpeed({
-      scene:this,
-      player: player3,
-      controls: p3Controls,
-      touching,
-      isLarger: p3Larger
-    })
-
-    // Shrink after 15 seconds
-    function resetPlayerSizeIfNeeded(player) {
-      if (player.size == 3 || player.size == 1) {
-        this.time.delayedCall(15000, () => {
-          this.tweens.add({
+    if (!isOnGrowPlatform && player.scaleX > 1 && !player.ungrowTimeStarted) {
+      player.ungrowTimeStarted = true;
+      scene.time.delayedCall(10000, () => {
+        const stillOff = !(player.body.touching.down && growPlatform.body.touching.up);
+        if (stillOff && player.scaleX > 1) {
+          scene.tweens.add({
             targets: player,
             scaleX: 1,
             scaleY: 1,
-            duration: 300,
+            duration: 500,
             ease: 'Power2',
             onComplete: () => {
-              player.size = 2;
+              player.body.setSize(player.displayWidth, player.displayHeight, true);
+              resetPlayerPhysics(player);
+              player.ungrowTimeStarted = false;
             },
           });
-        });
-      }
+        } else {
+          player.ungrowTimeStarted = false;
+        }
+      });
     }
-    resetPlayerSizeIfNeeded.call(this, player1);
-    resetPlayerSizeIfNeeded.call(this, player2);
-    resetPlayerSizeIfNeeded.call(this, player3);
-  
-       if (gameOver) {
-
-      setGameOver(this);
-      
-    }
-    
-   
-
-    function handlePlayerControls(player, controls, speed) {
-      if (player.dead) return;
-      if (controls.left.isDown) {
-        player.setVelocityX(-speed);
-        player.anims.play('left', true);
-      } else if (controls.right.isDown) {
-        player.setVelocityX(speed);
-        player.anims.play('right', true);
-      } else {
-        player.setVelocityX(0);
-        player.anims.play('turn');
-      }
-      if (controls.up.isDown && player.body.touching.down) {
-        player.setVelocityY(-330);
-      }
-    }
-    handlePlayerControls(player1, p1Controls, player1Speed);
-    handlePlayerControls(player2, p2Controls, player2Speed);
-    handlePlayerControls(player3, p3Controls, player3Speed);
   }
+
+  function handleUngrowForPlayer(player, scene) {
+    scene.platforms.getChildren().forEach(platform => {
+      if (platform.effect === 'grow') handleUngrow(player, platform, scene);
+    });
+  }
+
+  players.forEach(player => handleUngrowForPlayer(player, this));
+
+  function handleUnshrink(player, shrinkPlatform, scene) {
+    const isOnShrinkPlatform = player.body.touching.down && shrinkPlatform.body.touching.up;
+
+    if (!isOnShrinkPlatform && player.scaleX < 1 && !player.unshrinkTimerStarted) {
+      player.unshrinkTimerStarted = true;
+      scene.time.delayedCall(10000, () => {
+        const stillOff = !(player.body.touching.down && shrinkPlatform.body.touching.up);
+        if (stillOff && player.scaleX < 1) {
+          scene.tweens.add({
+            targets: player,
+            scaleX: 1,
+            scaleY: 1,
+            duration: 500,
+            ease: 'Power2',
+            onComplete: () => {
+              player.body.setSize(player.displayWidth, player.displayHeight, true);
+              resetPlayerPhysics(player);
+              player.unshrinkTimerStarted = false;
+            },
+          });
+        } else {
+          player.unshrinkTimerStarted = false;
+        }
+      });
+    }
+  }
+
+  function handleUnshrinkForPlayer(player, scene) {
+    scene.platforms.getChildren().forEach(platform => {
+      if (platform.effect === 'shrink') handleUnshrink(player, platform, scene);
+    });
+  }
+
+  players.forEach(player => handleUnshrinkForPlayer(player, this));
+
+  function handleCloudPlatformInteraction(player, cloudPlatform, scene) {
+    const isOnCloudPlatform = player.body.touching.down && cloudPlatform.body.touching.up;
+
+    if (isOnCloudPlatform && (player.size === 2 || player.size === 3)) {
+      const duration = player.size === 2 ? 2000 : 1000;
+
+      scene.tweens.add({
+        targets: cloudPlatform,
+        alpha: 0,
+        duration,
+        ease: 'Linear',
+        onComplete: () => {
+          const newX = Phaser.Math.Between(-50, 850);
+          const newY = 650 + Phaser.Math.Between(0, 200);
+          cloudPlatform.disableBody(true, true);
+          cloudPlatform.enableBody(true, newX, newY, true, true);
+          cloudPlatform.setAlpha(1);
+          cloudPlatform.setVelocityY(-velocity);
+        },
+      });
+    }
+  }
+
+  function handleCloudPlatformForPlayer(player, scene) {
+    scene.platforms.getChildren().forEach(platform => {
+      if (platform.effect === 'cloud') handleCloudPlatformInteraction(player, platform, scene);
+    });
+  }
+
+  players.forEach(player => handleCloudPlatformForPlayer(player, this));
+
+  function updatePlayerSpeed({ scene, controls, player, touching, isLarger }) {
+    let speed = 200;
+
+    if (player.currentPlatformType === 'fast') {
+      if (controls.right.isDown) speed = 300;
+      else if (controls.left.isDown) speed = 100;
+    } else if (player.currentPlatformType === 'slow') {
+      if (controls.right.isDown) speed = 100;
+      else if (controls.left.isDown) speed = 300;
+    }
+
+    if ((touching.left || touching.right) && isLarger) {
+      speed *= 2;
+    }
+
+    return speed;
+  }
+
+  const player1Speed = updatePlayerSpeed({
+    scene: this,
+    player: player1,
+    controls: p1Controls,
+    touching,
+    isLarger: p1Larger,
+  });
+
+  const player2Speed = player2
+    ? updatePlayerSpeed({
+        scene: this,
+        player: player2,
+        controls: p2Controls,
+        touching,
+        isLarger: p2Larger,
+      })
+    : 0;
+
+  const player3Speed = player3
+    ? updatePlayerSpeed({
+        scene: this,
+        player: player3,
+        controls: p3Controls,
+        touching,
+        isLarger: p3Larger,
+      })
+    : 0;
+
+  function resetPlayerSizeIfNeeded(player) {
+    if (player.size === 3 || player.size === 1) {
+      this.time.delayedCall(15000, () => {
+        this.tweens.add({
+          targets: player,
+          scaleX: 1,
+          scaleY: 1,
+          duration: 300,
+          ease: 'Power2',
+          onComplete: () => {
+            player.size = 2;
+          },
+        });
+      });
+    }
+  }
+
+  players.forEach(player => resetPlayerSizeIfNeeded.call(this, player));
+
+  if (gameOver) {
+    setGameOver(this);
+  }
+
+  function handlePlayerControls(player, controls, speed) {
+    if (player.dead) return;
+    if (controls.left.isDown) {
+      player.setVelocityX(-speed);
+      player.anims.play('left', true);
+    } else if (controls.right.isDown) {
+      player.setVelocityX(speed);
+      player.anims.play('right', true);
+    } else {
+      player.setVelocityX(0);
+      player.anims.play('turn');
+    }
+    if (controls.up.isDown && player.body.touching.down) {
+      player.setVelocityY(-330);
+    }
+  }
+
+  handlePlayerControls(player1, p1Controls, player1Speed);
+  if (player2) handlePlayerControls(player2, p2Controls, player2Speed);
+  if (player3) handlePlayerControls(player3, p3Controls, player3Speed);
+}
+
 
    
 
