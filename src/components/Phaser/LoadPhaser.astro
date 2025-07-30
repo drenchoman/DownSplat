@@ -651,6 +651,9 @@ if (touching.p3AboveP1 && p3Larger) {
       // p2Lives.setText('P2 Lives: ' + player.lives);
       p2LivesText.set(player.lives);
     }
+    if (player == player3){
+      p3LivesText.set(player.lives);
+    }
     if (player.lives == 0) {
       gameOver = true;
       gameFinished.set(true);

@@ -1,9 +1,19 @@
 
 <div id="gameOverlay">
   <div class="livesOverlay hide">
-  <div class="player-one-lives"><h2>P1 Lives <br/> <span class="p1-lives-text"></span></h2></div>
-  <div class="player-two-lives"><h2>P2 Lives <br/><span class="p2-lives-text"></span></h2></div>
-  <div class="player-three-lives"><h2>P3 Lives <br/> <span class="p3-lives-text"></span></h2></div>
+  <div class="player-one-lives">
+    <span>P1 Lives <br/> <span class="p1-lives-text"></span></span>
+    <br/>
+    <span>Arrow Keys </span>
+  </div>
+  <div class="player-two-lives"><span>P2 Lives <br/><span class="p2-lives-text"></span></span>
+    <br/>
+      <span>Z &lt; &gt; X </span>
+</div>
+  <div class="player-three-lives"><span>P3 Lives <br/> <span class="p3-lives-text"></span></span><br/>
+          <span>N &lt; &gt; M</span>
+
+  </div>
   </div>
 
   <div class="init-wrapper">
@@ -45,6 +55,11 @@
     const hearts = '❤️'.repeat(lives);
     document.querySelector('.p2-lives-text').innerHTML = hearts;
   })
+
+  p3LivesText.subscribe(lives => {
+    const hearts = '❤️'.repeat(lives);
+    document.querySelector('.p3-lives-text').innerHTML = hearts;
+  })
   
 
  
@@ -74,20 +89,25 @@ document.getElementById('playAgain')?.addEventListener("click", restartGame)
   .player-one-lives{
     position: absolute;
     left: -110px;
+    color:white;
   }
 
   .player-two-lives{
     position: absolute;
-    right: -110px;
+    right: -105px;
+        color:white;
+
   }
 
   .player-three-lives{
     position: absolute; 
   left: 0; 
   right: 0; 
-  bottom: -75px;
+  bottom: -80px;
   margin-inline: auto; 
   width: fit-content;
+      color:white;
+
   }
 
   .play-again-wrapper{
