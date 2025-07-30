@@ -23,8 +23,10 @@ import Phaser from 'phaser';
 
   var player1;
   var player2;
+  var player3;
   var p1Controls;
   var p2Controls;
+  var p3Controls;
   var gameOver = false;
   var p1Lives;
   var p2Lives;
@@ -118,6 +120,7 @@ gameStarted.subscribe(started => {
 
    player1 = createPlayer(this, 300, 50);
    player2 = createPlayer(this, 500, 50, 0x00ff00);
+   player3 = createPlayer(this, 400, 50, 0xeeffee);
 
     //  Our player animations, turning, walking left and walking right.
     this.anims.create({
@@ -153,6 +156,11 @@ gameStarted.subscribe(started => {
       right: Phaser.Input.Keyboard.KeyCodes.X,
       up: Phaser.Input.Keyboard.KeyCodes.S,
     });
+    p3Controls = this.input.keyboard.addKeys({
+      left: Phaser.Input.Keyboard.KeyCodes.N,
+      right: Phaser.Input.Keyboard.KeyCodes.M,
+      up: Phaser.Input.Keyboard.KeyCodes.J
+    });
 
     // TEXT //
 
@@ -165,9 +173,9 @@ gameStarted.subscribe(started => {
 
     // Colliders
 
-    this.physics.add.collider([player1, player2], platform);
+    this.physics.add.collider([player1, player2, player3], platform);
     this.physics.add.collider(
-      [player1, player2],
+      [player1, player2, player3],
       ground,
       (playerThatDied, ground) => {
         playerLose(playerThatDied, ground, this); // pass the scene explicitly
@@ -176,7 +184,7 @@ gameStarted.subscribe(started => {
       this
     );
     this.physics.add.collider(
-      [player1, player2],
+      [player1, player2, player3],
       roof,
       (playerThatDied, ground) => {
         playerLose(playerThatDied, ground, this); // pass the scene explicitly
@@ -185,6 +193,9 @@ gameStarted.subscribe(started => {
       this
     );
     this.physics.add.collider(player1, player2);
+    this.physics.add.collider(player1, player3);
+    this.physics.add.collider(player2, player3);
+   
 
     function spawnPlatform(scene) {
       const types = [
@@ -208,7 +219,7 @@ gameStarted.subscribe(started => {
       platform.effect = choice.effect;
 
       scene.physics.add.collider(
-        [player1, player2],
+        [player1, player2, player3],
         platform,
         (player, plat) => {
           switch (plat.effect) {
@@ -288,36 +299,61 @@ gameStarted.subscribe(started => {
   
 
   function update() {
-    const p1Larger = player1.size > player2.size;
-    const p2Larger = player2.size > player1.size;
+    const p1Larger = player1.size > player2.size || player1.size > player3.size;
+    const p2Larger = player2.size > player1.size || player2.size > player3.size;
+    const p3Larger = player3.size > player1.size || player3.size > player2.size;
+
 
   
 
     // Determine contact points
     const touching = {
-      right:
-        player1.body.touching.right && player2.body.touching.left,
-      left:
-        player1.body.touching.left && player2.body.touching.right,
-      p1Above:
-        player1.body.touching.down && player2.body.touching.up,
-      p2Above:
-        player2.body.touching.down && player1.body.touching.up,
-    };
+  // Player 1 ↔ Player 2
+  p1RightP2: player1.body.touching.right && player2.body.touching.left,
+  p1LeftP2:  player1.body.touching.left  && player2.body.touching.right,
+  p1AboveP2: player1.body.touching.down  && player2.body.touching.up,
+  p2AboveP1: player2.body.touching.down  && player1.body.touching.up,
+
+  // Player 1 ↔ Player 3
+  p1RightP3: player1.body.touching.right && player3.body.touching.left,
+  p1LeftP3:  player1.body.touching.left  && player3.body.touching.right,
+  p1AboveP3: player1.body.touching.down  && player3.body.touching.up,
+  p3AboveP1: player3.body.touching.down  && player1.body.touching.up,
+
+  // Player 2 ↔ Player 3
+  p2RightP3: player2.body.touching.right && player3.body.touching.left,
+  p2LeftP3:  player2.body.touching.left  && player3.body.touching.right,
+  p2AboveP3: player2.body.touching.down  && player3.body.touching.up,
+  p3AboveP2: player3.body.touching.down  && player2.body.touching.up,
+};
 
     // Reset platform type if not standing on one
-    [player1, player2].forEach((player) => {
+    [player1, player2, player3].forEach((player) => {
       if (!player.body.touching.down) {
         player.currentPlatformType = null;
       }
     });
 
     // Handle crush logic
-    if (touching.p1Above && p1Larger) {
-      playerLose(player2, null, this);
-    } else if (touching.p2Above && p2Larger) {
-      playerLose(player1, null, this);
-    }
+   if (touching.p1AboveP2 && p1Larger) {
+  playerLose(player2, null, this);
+} else if (touching.p1AboveP3 && p1Larger) {
+  playerLose(player3, null, this);
+}
+
+// Player 2 crushes Player 1 or Player 3
+if (touching.p2AboveP1 && p2Larger) {
+  playerLose(player1, null, this);
+} else if (touching.p2AboveP3 && p2Larger) {
+  playerLose(player3, null, this);
+}
+
+// Player 3 crushes Player 1 or Player 2
+if (touching.p3AboveP1 && p3Larger) {
+  playerLose(player1, null, this);
+} else if (touching.p3AboveP2 && p3Larger) {
+  playerLose(player2, null, this);
+}
 
     function handleUngrow(player, growPlatform, scene) {
       const isOnGrowPlatform =
@@ -369,6 +405,7 @@ gameStarted.subscribe(started => {
     }
     handleUngrowForPlayer(player1, this);
     handleUngrowForPlayer(player2, this);
+    handleUngrowForPlayer(player3, this);
 
     function handleUnshrink(player, shrinkPlatform, scene) {
       const isOnShrinkPlatform =
@@ -420,6 +457,7 @@ gameStarted.subscribe(started => {
     }
     handleUnshrinkForPlayer(player1, this);
     handleUnshrinkForPlayer(player2, this);
+    handleUnshrinkForPlayer(player3, this);
 
     function handleCloudPlatformInteraction(
       player,
@@ -467,6 +505,7 @@ gameStarted.subscribe(started => {
     }
     handleCloudPlatformForPlayer(player1, this);
     handleCloudPlatformForPlayer(player2, this);
+    handleCloudPlatformForPlayer(player3, this);
 
     function updatePlayerSpeed({
       scene,
@@ -514,6 +553,14 @@ gameStarted.subscribe(started => {
       isLarger: p2Larger,
     });
 
+    var player3Speed = updatePlayerSpeed({
+      scene:this,
+      player: player3,
+      controls: p3Controls,
+      touching,
+      isLarger: p3Larger
+    })
+
     // Shrink after 15 seconds
     function resetPlayerSizeIfNeeded(player) {
       if (player.size == 3 || player.size == 1) {
@@ -533,6 +580,7 @@ gameStarted.subscribe(started => {
     }
     resetPlayerSizeIfNeeded.call(this, player1);
     resetPlayerSizeIfNeeded.call(this, player2);
+    resetPlayerSizeIfNeeded.call(this, player3);
   
        if (gameOver) {
 
@@ -560,6 +608,7 @@ gameStarted.subscribe(started => {
     }
     handlePlayerControls(player1, p1Controls, player1Speed);
     handlePlayerControls(player2, p2Controls, player2Speed);
+    handlePlayerControls(player3, p3Controls, player3Speed);
   }
 
    
