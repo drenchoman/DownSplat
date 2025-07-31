@@ -1,5 +1,6 @@
 
 <div id="gameOverlay">
+  <h2 class="header">DownSplat</h2>
   <div class="livesOverlay hide">
   <div class="player-one-lives">
     <span>P1 Lives <br/> <span class="p1-lives-text"></span></span>
@@ -98,6 +99,17 @@ document.getElementById('playAgain')?.addEventListener("click", restartGame)
     border:1px solid white;
     position: absolute;
     /* z-index: 5; */
+  }
+
+  .header{
+     position: absolute; 
+     font-size: 48px;
+  left: 0; 
+  right: 0; 
+  top: -110px;
+  margin-inline: auto; 
+  width: fit-content;
+      color:white;
   }
 
   .player-one-lives{

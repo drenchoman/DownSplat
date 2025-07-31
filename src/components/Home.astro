@@ -3,7 +3,8 @@ import LoadPhaser from "./Phaser/LoadPhaser.astro"
 import Test from "./Test.astro"
 ---
 
-<div class="wrapper">
+
+<div class="game-wrapper">
   <Test />
   <div id="game-container">
     
@@ -16,15 +17,24 @@ import Test from "./Test.astro"
 
 <style>
 
-  .wrapper{
+  .game-wrapper{
     display: flex;
     justify-content: center;
     align-items: center;
-    height:100vh;
+    /* height: 100%; */
     background-color: black;
+    height:100vh;
   }
   #game-container{
    display: inline-block;
+  }
+
+  .wrapper{
+        background-color: black;
+
+  }
+  .header{
+    /* color: white; */
   }
 
   #testButton{
