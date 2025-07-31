@@ -18,10 +18,12 @@
   </div>
 
   <div class="init-wrapper">
-
-<button id="onePlayer">One Player</button>
+    <h3>Jump in!</h3>
+<div class="player-button-wrapper">
 <button id="twoPlayer">Two Player</button>
 <button id="threePlayer">Three Player</button>
+</div>
+
 </div>
 <div class="play-again-wrapper hide">
   <button id="playAgain">Play Again</button>
@@ -61,6 +63,12 @@
     const hearts = '❤️'.repeat(lives);
     document.querySelector('.p3-lives-text').innerHTML = hearts;
   })
+
+  numberOfPlayers.subscribe(num => {
+    if(num == 2){
+      document.querySelector('.player-three-lives')?.classList.add('hide')
+    }
+  })
   
 
  function startSinglePlayer(){
@@ -92,12 +100,17 @@ document.getElementById('playAgain')?.addEventListener("click", restartGame)
 </script>
 
 <style>
-
+*{
+  color: white;
+}
   #gameOverlay{
     width: 800px;
     height: 600px;
     border:1px solid white;
     position: absolute;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
     /* z-index: 5; */
   }
 
@@ -115,12 +128,14 @@ document.getElementById('playAgain')?.addEventListener("click", restartGame)
   .player-one-lives{
     position: absolute;
     left: -110px;
+    top:0;
     color:white;
   }
 
   .player-two-lives{
     position: absolute;
     right: -105px;
+    top:0;
         color:white;
 
   }
@@ -136,6 +151,28 @@ document.getElementById('playAgain')?.addEventListener("click", restartGame)
 
   }
 
+  .player-button-wrapper{
+    display: flex;
+    justify-content: center;
+    gap:10px;
+  }
+
+  .player-button-wrapper > * {
+    width: 100px;
+    background-color: darkviolet;
+    border:1px solid black;
+    padding: 0.25rem 0.5rem;
+        cursor: pointer;
+
+  }
+  
+
+  .init-wrapper{
+        display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
   .play-again-wrapper{
     display: flex;
     width:100%;
@@ -145,6 +182,10 @@ document.getElementById('playAgain')?.addEventListener("click", restartGame)
   }
   #playAgain{
     cursor: pointer;
+    width: 100px;
+    background-color: darkviolet;
+    border:1px solid black;
+    padding: 0.25rem 0.5rem;
   }
 
   .hide{
