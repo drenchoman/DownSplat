@@ -10,3 +10,4 @@ export const numberOfPlayers = atom(1);
 export const p1LivesText = atom(3);
 export const p2LivesText = atom(3);
 export const p3LivesText = atom(3);
+export const gameWinner = atom();

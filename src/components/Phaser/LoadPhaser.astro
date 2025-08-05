@@ -1,5 +1,5 @@
 <script>
-import { gameStarted, gameFinished, p1LivesText, p2LivesText, p3LivesText, numberOfPlayers } from '../../store';
+import { gameStarted, gameFinished, p1LivesText, p2LivesText, p3LivesText, numberOfPlayers, gameWinner } from '../../store';
 import Phaser from 'phaser';
   var config = {
     type: Phaser.AUTO,
@@ -28,7 +28,8 @@ import Phaser from 'phaser';
   var p2Controls;
   var p3Controls;
   var gameOver = false;
-  var deadCounter = 0;
+  var deadCounter = [];
+  var allPlayers = ['Player 1','Player 2','Player 3']
   var totalPlayers;
   var p1Lives;
   var p2Lives;
@@ -112,7 +113,7 @@ numberOfPlayers.subscribe(numOfPlayers => {
 
     // The player and its settings
     //  initial player new player
-    function createPlayer(scene, x, y, tint = null) {
+    function createPlayer(scene, x, y, name, tint = null) {
       const player = scene.physics.add.sprite(x, y, 'dude');
       // player.setBounce(0.01);
       player.setCollideWorldBounds(true);
@@ -120,6 +121,7 @@ numberOfPlayers.subscribe(numOfPlayers => {
       player.setGravityY(initalGravity);
       player.size = 2;
       player.lives = 3;
+      player.name = name;
       if (tint) player.setTint(tint);
       return player;
     }
@@ -133,7 +135,7 @@ numberOfPlayers.subscribe(numOfPlayers => {
     for( let i = 0; i < numOfPlayers; i++){
       const x = playerPositions[i] || 400;
       const tint = playerTints[i] || null;
-      const player = createPlayer(this,x, 50, tint);
+      const player = createPlayer(this,x, 50, i+1, tint);
       players.push(player)
     }
       [player1,player2,player3]= players;
@@ -568,7 +570,8 @@ numberOfPlayers.subscribe(numOfPlayers => {
   function setGameOver(scene) {
     scene.physics.pause();
     
-
+    let winner = allPlayers.filter(p => !deadCounter.includes(p))
+    gameWinner.set(winner[0])
     // player1.anims.pause(); 
     // player2.anims.pause();
 
@@ -607,12 +610,13 @@ numberOfPlayers.subscribe(numOfPlayers => {
       p3LivesText.set(player.lives);
     }
     if (player.lives == 0) {
-      deadCounter++
-      if(deadCounter == 1 && totalPlayers == 2){
+      let name = `Player ${player.name}`
+      deadCounter.push(name)
+      if(deadCounter.length == 1 && totalPlayers == 2){
         gameOver = true;
         gameFinished.set(true);
       }
-      if(deadCounter == 2 && totalPlayers ==3){
+      if(deadCounter.length == 2 && totalPlayers ==3){
         gameOver = true;
         gameFinished.set(true);
       }
