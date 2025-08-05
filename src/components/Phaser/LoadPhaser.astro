@@ -28,6 +28,8 @@ import Phaser from 'phaser';
   var p2Controls;
   var p3Controls;
   var gameOver = false;
+  var deadCounter = 0;
+  var totalPlayers;
   var p1Lives;
   var p2Lives;
   var ground;
@@ -44,6 +46,10 @@ gameStarted.subscribe(started => {
 
   } 
     
+})
+
+numberOfPlayers.subscribe(numOfPlayers => {
+  totalPlayers = numOfPlayers
 })
 
 // gameFinished.subscribe(finished => {
@@ -601,8 +607,17 @@ gameStarted.subscribe(started => {
       p3LivesText.set(player.lives);
     }
     if (player.lives == 0) {
-      gameOver = true;
-      gameFinished.set(true);
+      deadCounter++
+      if(deadCounter == 1 && totalPlayers == 2){
+        gameOver = true;
+        gameFinished.set(true);
+      }
+      if(deadCounter == 2 && totalPlayers ==3){
+        gameOver = true;
+        gameFinished.set(true);
+      }
+      return
+    
     }
   }
 
@@ -634,7 +649,13 @@ gameStarted.subscribe(started => {
     playerThatDied.lives--;
     updateLives(playerThatDied);
 
-    scene.time.delayedCall(2000, () => {
+    // Dont respawn if lives == 0
+    // TODO: Cool death animation when they die for the last time
+    if(playerThatDied.lives == 0){
+      return
+    }
+    else {
+  scene.time.delayedCall(2000, () => {
       const tint = playerThatDied === player2 ? 0x00ff00 : null;
       const randomX = Phaser.Math.Between(150, 700);
       respawnPlayer.call(
@@ -645,6 +666,7 @@ gameStarted.subscribe(started => {
         tint
       );
     });
+  }
   }
 
 
