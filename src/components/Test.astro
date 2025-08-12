@@ -33,7 +33,7 @@
 </div>
 
 <script>
-  import { gameStarted, gameFinished, p1LivesText, p2LivesText, p3LivesText, numberOfPlayers, gameWinner } from "../store";
+  import { gameStarted, gameFinished, p1LivesText, p2LivesText, p3LivesText, numberOfPlayers, gameWinner, p1Wins, p2Wins, p3Wins } from "../store";
   gameStarted.subscribe(started => {
     if (started){
       document.querySelector('.init-wrapper')?.classList.add('hide')
