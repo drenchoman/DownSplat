@@ -66,10 +66,14 @@ numberOfPlayers.subscribe(numOfPlayers => {
     this.load.image('star', 'phaser/assets/star.png');
     this.load.image('bomb', 'phaser/assets/bomb.png');
     // this.load.image('blob', 'phaser/assets/blob-test.png')
-    this.load.spritesheet('test', 'phaser/assets/test.png', {
+    this.load.spritesheet('p1', 'phaser/assets/p1.png', {
       frameWidth: 32,
       frameHeight: 32,
     });
+    this.load.spritesheet('p2', 'phaser/assets/p2.png',{
+      frameWidth: 32,
+      frameHeight: 32
+    })
   }
 
   function create() {
@@ -114,8 +118,10 @@ numberOfPlayers.subscribe(numOfPlayers => {
 
     // The player and its settings
     //  initial player new player
-    function createPlayer(scene, x, y, name, tint = null) {
-      const player = scene.physics.add.sprite(x, y, 'test');
+    function createPlayer(scene, x, y, name) {
+      let sprite = `p${name}`
+            
+      const player = scene.physics.add.sprite(x, y, sprite );
       // player.setBounce(0.01);
       player.setCollideWorldBounds(true);
       player.body.checkCollision.down = true;
@@ -123,10 +129,38 @@ numberOfPlayers.subscribe(numOfPlayers => {
       player.size = 2;
       player.lives = 3;
       player.name = name;
-      if (tint) player.setTint(tint);
+
+      // Create animations for each player
+      player.anims.create({
+      key: 'left',
+      frames: player.anims.generateFrameNumbers(sprite, {
+        start: 0,
+        end: 1,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    })
+
+      player.anims.create({
+      key: 'turn',
+      frames: [{ key: sprite, frame: 2 }],
+      frameRate: 20,
+    });
+
+    player.anims.create({
+      key: 'right',
+      frames: player.anims.generateFrameNumbers(sprite, {
+        start: 3,
+        end: 4,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+      
+      
       return player;
     }
-    const playerTints = [null, 0x48CAE4, 0xeeffee]; // Define tints if you want variety
+   
     const playerPositions = [300, 500, 400];
     let players = [];
 
@@ -135,8 +169,7 @@ numberOfPlayers.subscribe(numOfPlayers => {
 
     for( let i = 0; i < numOfPlayers; i++){
       const x = playerPositions[i] || 400;
-      const tint = playerTints[i] || null;
-      const player = createPlayer(this,x, 50, i+1, tint);
+      const player = createPlayer(this,x, 50, i+1);
       players.push(player)
     }
       [player1,player2,player3]= players;
@@ -149,31 +182,31 @@ numberOfPlayers.subscribe(numOfPlayers => {
   //  player3 = createPlayer(this, 500, 50, 0xeeffee);
 
     //  Our player animations, turning, walking left and walking right.
-    this.anims.create({
-      key: 'left',
-      frames: this.anims.generateFrameNumbers('test', {
-        start: 0,
-        end: 1,
-      }),
-      frameRate: 10,
-      repeat: -1,
-    });
+    // this.anims.create({
+    //   key: 'left',
+    //   frames: this.anims.generateFrameNumbers('p2', {
+    //     start: 0,
+    //     end: 1,
+    //   }),
+    //   frameRate: 10,
+    //   repeat: -1,
+    // });
 
-    this.anims.create({
-      key: 'turn',
-      frames: [{ key: 'test', frame: 2 }],
-      frameRate: 20,
-    });
+    // this.anims.create({
+    //   key: 'turn',
+    //   frames: [{ key: 'p2', frame: 2 }],
+    //   frameRate: 20,
+    // });
 
-    this.anims.create({
-      key: 'right',
-      frames: this.anims.generateFrameNumbers('test', {
-        start: 3,
-        end: 4,
-      }),
-      frameRate: 10,
-      repeat: -1,
-    });
+    // this.anims.create({
+    //   key: 'right',
+    //   frames: this.anims.generateFrameNumbers('p2', {
+    //     start: 3,
+    //     end: 4,
+    //   }),
+    //   frameRate: 10,
+    //   repeat: -1,
+    // });
 
     //  Input Events
     p1Controls = this.input.keyboard.createCursorKeys();
@@ -656,19 +689,17 @@ numberOfPlayers.subscribe(numOfPlayers => {
 
     // Dont respawn if lives == 0
     // TODO: Cool death animation when they die for the last time
-    if(playerThatDied.lives == 0){
+    if(playerThatDied.lives <= 0){
       return
     }
     else {
   scene.time.delayedCall(2000, () => {
-      const tint = playerThatDied === player2 ? 0x00ff00 : null;
       const randomX = Phaser.Math.Between(150, 700);
       respawnPlayer.call(
         scene,
         playerThatDied,
         randomX,
         75,
-        tint
       );
     });
   }
@@ -700,9 +731,7 @@ numberOfPlayers.subscribe(numOfPlayers => {
     playerObj.setPosition(x, y);
 
     playerObj.clearTint();
-    if (tint !== null) {
-      playerObj.setTint(tint);
-    }
+  
 
     resetPlayerPhysics(playerObj);
   }
