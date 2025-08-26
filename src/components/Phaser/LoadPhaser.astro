@@ -73,8 +73,13 @@ numberOfPlayers.subscribe(numOfPlayers => {
     this.load.spritesheet('p2', 'phaser/assets/p2.png',{
       frameWidth: 32,
       frameHeight: 32
-    })
+    });
+     this.load.spritesheet('p3', 'phaser/assets/p3.png',{
+      frameWidth: 32,
+      frameHeight: 32
+    });
   }
+  
 
   function create() {
     // this.physics.world.createDebugGraphic();

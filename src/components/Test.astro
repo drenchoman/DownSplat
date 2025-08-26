@@ -1,3 +1,9 @@
+---
+import {Image} from 'astro:assets'
+import p1Sprite from '../assets/p1sprite.png'
+import p2Sprite from '../assets/p2sprite.png'
+import p3Sprite from '../assets/p3sprite.png'
+---
 
 <div id="gameOverlay">
   <h2 class="header">DownSplat</h2>
@@ -5,14 +11,21 @@
   <div class="player-one-lives">
     <span>P1 Lives <br/> <span class="p1-lives-text"></span></span>
     <br/>
+    <Image src={p1Sprite} alt="A bird sitting on a nest of eggs." />
+    <br />
     <span>Arrow Keys </span>
   </div>
   <div class="player-two-lives"><span>P2 Lives <br/><span class="p2-lives-text"></span></span>
     <br/>
+     <Image src={p2Sprite} alt="A bird sitting on a nest of eggs." />
+    <br />
       <span>Z &lt; &gt; X </span>
 </div>
-  <div class="player-three-lives"><span>P3 Lives <br/> <span class="p3-lives-text"></span></span><br/>
-          <span>N &lt; &gt; M</span>
+  <div class="player-three-lives"><span>P3 Lives <br/> <span class="p3-lives-text"></span></span>
+    <br/>
+     <Image src={p3Sprite} alt="A bird sitting on a nest of eggs." />
+    <br />
+       <span>N &lt; &gt; M</span>
 
   </div>
   </div>
@@ -140,13 +153,14 @@ document.getElementById('playAgain')?.addEventListener("click", restartGame)
     left: -110px;
     top:0;
     color:white;
+    text-align: center;
   }
-
   .player-two-lives{
     position: absolute;
     right: -105px;
     top:0;
         color:white;
+    text-align: center;
 
   }
 
@@ -154,10 +168,11 @@ document.getElementById('playAgain')?.addEventListener("click", restartGame)
     position: absolute; 
   left: 0; 
   right: 0; 
-  bottom: -80px;
+  bottom: -105px;
   margin-inline: auto; 
   width: fit-content;
       color:white;
+    text-align: center;
 
   }
 
