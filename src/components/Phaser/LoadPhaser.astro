@@ -324,6 +324,7 @@ numberOfPlayers.subscribe(numOfPlayers => {
     p1LivesText.set(3)
     p2LivesText.set(3);
     p3LivesText.set(3);
+    deadCounter.length = 0;
       scene.scene.restart()
      }
 
@@ -681,34 +682,27 @@ numberOfPlayers.subscribe(numOfPlayers => {
   //   }
   // }
 
-  function playerLose(playerThatDied, ground, scene) {
-    // player.setVelocity(0, 0);
-    playerThatDied.dead = true;
-    playerThatDied.body.checkCollision.none = true;
-    playerThatDied.unshrinkTimerStarted = false;
-    playerThatDied.ungrowTimeStarted = false;
-    playerThatDied.setTint(0xff0000);
-    playerThatDied.anims.play('turn');
-    playerThatDied.lives--;
-    updateLives(playerThatDied);
+ function playerLose(playerThatDied, ground, scene) {
+  if (playerThatDied.deadThisFrame) return; // prevent double hit
+  playerThatDied.deadThisFrame = true;
 
-    // Dont respawn if lives == 0
-    // TODO: Cool death animation when they die for the last time
-    if(playerThatDied.lives <= 0){
-      return
-    }
-    else {
-  scene.time.delayedCall(2000, () => {
+  playerThatDied.dead = true;
+  playerThatDied.body.checkCollision.none = true;
+  playerThatDied.unshrinkTimerStarted = false;
+  playerThatDied.ungrowTimeStarted = false;
+  playerThatDied.setTint(0xff0000);
+  playerThatDied.anims.play('turn');
+  playerThatDied.lives--;
+  updateLives(playerThatDied);
+
+  if (playerThatDied.lives > 0) {
+    scene.time.delayedCall(2000, () => {
       const randomX = Phaser.Math.Between(150, 700);
-      respawnPlayer.call(
-        scene,
-        playerThatDied,
-        randomX,
-        75,
-      );
+      respawnPlayer.call(scene, playerThatDied, randomX, 75);
+      playerThatDied.deadThisFrame = false; // reset for future rounds
     });
   }
-  }
+}
 
 
   function respawnPlayer(playerObj, x, y, tint = null) {
