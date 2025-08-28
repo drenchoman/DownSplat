@@ -65,7 +65,13 @@ numberOfPlayers.subscribe(numOfPlayers => {
     this.load.image('ground', 'phaser/assets/platform.png');
     this.load.image('star', 'phaser/assets/star.png');
     this.load.image('bomb', 'phaser/assets/bomb.png');
-    // this.load.image('blob', 'phaser/assets/blob-test.png')
+    this.load.image('normal', 'phaser/assets/normal.png');
+    this.load.image('bounce', 'phaser/assets/bounce.png');
+    this.load.image('down', 'phaser/assets/down.png');
+    this.load.image('up', 'phaser/assets/up.png');
+    this.load.image('right', 'phaser/assets/right.png');
+    this.load.image('left', 'phaser/assets/left.png');
+    this.load.image('ice', 'phaser/assets/ice.png');
     this.load.spritesheet('p1', 'phaser/assets/p1.png', {
       frameWidth: 32,
       frameHeight: 32,
@@ -79,6 +85,9 @@ numberOfPlayers.subscribe(numOfPlayers => {
       frameHeight: 32
     });
   }
+
+
+
   
 
   function create() {
@@ -87,7 +96,7 @@ numberOfPlayers.subscribe(numOfPlayers => {
     //  A simple background for our game
     this.add.image(400, 300, 'sky');
 
-    ground = this.physics.add.sprite(400, 600, 'ground');
+    ground = this.physics.add.sprite(400, 600, 'normal');
     ground.displayWidth = 800;
     ground.body.allowGravity = false;
     ground.body.setImmovable(true);
@@ -116,7 +125,7 @@ numberOfPlayers.subscribe(numOfPlayers => {
     const platform = this.platforms.create(
       Phaser.Math.Between(300, 500),
       Phaser.Math.Between(400, 600),
-      'ground'
+      'normal'
     );
     platform.displayWidth = 300;
     platform.setVelocityY(-velocity); // float upwards
@@ -263,23 +272,22 @@ numberOfPlayers.subscribe(numOfPlayers => {
 
     function spawnPlatform(scene) {
       const types = [
-        { tint: 0xff0000, width: 300, effect: null }, // normal
-        { tint: 0x544223, width: 200, effect: 'bouncy' },
-        { tint: 0x800080, width: 200, effect: 'fast' },
-        { tint: 0xe47920, width: 200, effect: 'slow' },
-        { tint: 0x00ff00, width: 250, effect: 'grow' },
-        { tint: 0x1e7df0, width: 250, effect: 'shrink' },
-        { tint: 0xbae0f3, width: 250, effect: 'cloud' },
+        { name: 'normal', width: 300, effect: null }, // normal
+        { name: 'bounce', width: 300, effect: 'bouncy' },
+        { name: 'right', width: 300, effect: 'fast' },
+        { name: 'left', width: 300, effect: 'slow' },
+        { name: 'up', width: 350, effect: 'grow' },
+        { name: 'down', width: 350, effect: 'shrink' },
+        { name: 'ice', width: 350, effect: 'cloud' },
       ];
       const choice = Phaser.Utils.Array.GetRandom(types);
       const platform = scene.platforms.create(
         Phaser.Math.Between(-100, 900),
         Phaser.Math.Between(700, 1000),
-        'ground'
+        choice.name
       );
       platform.displayWidth = choice.width;
       platform.setVelocityY(-velocity);
-      platform.setTint(choice.tint);
       platform.effect = choice.effect;
 
       scene.physics.add.collider(
