@@ -53,12 +53,6 @@ numberOfPlayers.subscribe(numOfPlayers => {
   totalPlayers = numOfPlayers
 })
 
-// gameFinished.subscribe(finished => {
-//   if(finished == false){
-//    resetLives(player1, player2)
-//   }
-// })
-
 
   function preload() {
     this.load.image('sky', 'phaser/assets/sky.png');
@@ -72,6 +66,10 @@ numberOfPlayers.subscribe(numOfPlayers => {
     this.load.image('right', 'phaser/assets/right.png');
     this.load.image('left', 'phaser/assets/left.png');
     this.load.image('ice', 'phaser/assets/ice.png');
+    this.load.image('fire', 'phaser/assets/fire.png');
+    this.load.image('fire2', 'phaser/assets/fire2.png');
+    this.load.image('spikes', 'phaser/assets/spikes.png');
+
     this.load.spritesheet('p1', 'phaser/assets/p1.png', {
       frameWidth: 32,
       frameHeight: 32,
@@ -93,19 +91,30 @@ numberOfPlayers.subscribe(numOfPlayers => {
   function create() {
     // this.physics.world.createDebugGraphic();
 
+
     //  A simple background for our game
     this.add.image(400, 300, 'sky');
 
-    ground = this.physics.add.sprite(400, 600, 'normal');
-    ground.displayWidth = 800;
+    ground = this.physics.add.sprite(400, 600, 'fire');
     ground.body.allowGravity = false;
     ground.body.setImmovable(true);
-    ground.setTint(0xff0000);
+// Create two overlapping sprites
 
-    roof = this.physics.add.sprite(400, -15, 'ground');
-    roof.displayWidth = 800;
+ this.anims.create({
+    key: 'fireAnim',
+    frames: [
+      { key: 'fire' },
+      { key: 'fire2' }
+    ],
+    frameRate: 2,   // 2 frames per second (switches every 500ms)
+    repeat: -1      // loop forever
+  });
+
+  ground.play('fireAnim'); // play the animation on the ground sprite
+
+ 
+    roof = this.physics.add.sprite(400, -15, 'spikes');
     roof.body.allowGravity = false;
-    roof.setTint(0xff0000);
 
     this.platforms = this.physics.add.group({
       immovable: true,
@@ -286,7 +295,7 @@ numberOfPlayers.subscribe(numOfPlayers => {
         Phaser.Math.Between(700, 1000),
         choice.name
       );
-      platform.displayWidth = choice.width;
+      // platform.displayWidth = choice.width;
       platform.setVelocityY(-velocity);
       platform.effect = choice.effect;
 
@@ -420,32 +429,52 @@ numberOfPlayers.subscribe(numOfPlayers => {
   if (touching.p3AboveP1 && canCrush(player3, player1)) playerLose(player1, null, this);
   if (touching.p3AboveP2 && canCrush(player3, player2)) playerLose(player2, null, this);
 
-  function handleUngrow(player, growPlatform, scene) {
-    const isOnGrowPlatform = player.body.touching.down && growPlatform.body.touching.up;
+function handleUngrow(player, growPlatform, scene) {
+  const isOnGrowPlatform =
+    player.body.touching.down && growPlatform.body.touching.up;
 
-    if (!isOnGrowPlatform && player.scaleX > 1 && !player.ungrowTimeStarted) {
-      player.ungrowTimeStarted = true;
-      scene.time.delayedCall(10000, () => {
-        const stillOff = !(player.body.touching.down && growPlatform.body.touching.up);
-        if (stillOff && player.scaleX > 1) {
-          scene.tweens.add({
-            targets: player,
-            scaleX: 1,
-            scaleY: 1,
-            duration: 500,
-            ease: 'Power2',
-            onComplete: () => {
-              player.body.setSize(player.displayWidth, player.displayHeight, true);
-              resetPlayerPhysics(player);
-              player.ungrowTimeStarted = false;
-            },
-          });
-        } else {
-          player.ungrowTimeStarted = false;
-        }
-      });
+  if (!isOnGrowPlatform && player.scaleX > 1) {
+    // If there’s already a timer, cancel it
+    if (player.ungrowTimer) {
+      player.ungrowTimer.remove(false); // cancel previous
+      player.ungrowTimer = null;
     }
+
+    // Start a new timer
+    player.ungrowTimer = scene.time.delayedCall(10000, () => {
+      const stillOff = !(
+        player.body.touching.down && growPlatform.body.touching.up
+      );
+
+      if (stillOff && player.scaleX > 1) {
+        scene.tweens.add({
+          targets: player,
+          scaleX: 1,
+          scaleY: 1,
+          duration: 500,
+          ease: "Power2",
+          onComplete: () => {
+            player.body.setSize(
+              player.displayWidth,
+              player.displayHeight,
+              true
+            );
+            resetPlayerPhysics(player);
+            player.ungrowTimer = null; // clear ref
+          },
+        });
+      } else {
+        // Cancel shrink if they got back on
+        player.ungrowTimer = null;
+      }
+    });
+  } else if (isOnGrowPlatform && player.ungrowTimer) {
+    // If they stepped back on, reset the timer immediately
+    player.ungrowTimer.remove(false);
+    player.ungrowTimer = null;
   }
+}
+
 
   function handleUngrowForPlayer(player, scene) {
     scene.platforms.getChildren().forEach(platform => {
@@ -455,32 +484,51 @@ numberOfPlayers.subscribe(numOfPlayers => {
 
   players.forEach(player => handleUngrowForPlayer(player, this));
 
-  function handleUnshrink(player, shrinkPlatform, scene) {
-    const isOnShrinkPlatform = player.body.touching.down && shrinkPlatform.body.touching.up;
+function handleUnshrink(player, shrinkPlatform, scene) {
+  const isOnShrinkPlatform =
+    player.body.touching.down && shrinkPlatform.body.touching.up;
 
-    if (!isOnShrinkPlatform && player.scaleX < 1 && !player.unshrinkTimerStarted) {
-      player.unshrinkTimerStarted = true;
-      scene.time.delayedCall(10000, () => {
-        const stillOff = !(player.body.touching.down && shrinkPlatform.body.touching.up);
-        if (stillOff && player.scaleX < 1) {
-          scene.tweens.add({
-            targets: player,
-            scaleX: 1,
-            scaleY: 1,
-            duration: 500,
-            ease: 'Power2',
-            onComplete: () => {
-              player.body.setSize(player.displayWidth, player.displayHeight, true);
-              resetPlayerPhysics(player);
-              player.unshrinkTimerStarted = false;
-            },
-          });
-        } else {
-          player.unshrinkTimerStarted = false;
-        }
-      });
+  if (!isOnShrinkPlatform && player.scaleX < 1) {
+    // Cancel any existing timer
+    if (player.unshrinkTimer) {
+      player.unshrinkTimer.remove(false);
+      player.unshrinkTimer = null;
     }
+
+    // Start a new timer
+    player.unshrinkTimer = scene.time.delayedCall(10000, () => {
+      const stillOff = !(
+        player.body.touching.down && shrinkPlatform.body.touching.up
+      );
+
+      if (stillOff && player.scaleX < 1) {
+        scene.tweens.add({
+          targets: player,
+          scaleX: 1,
+          scaleY: 1,
+          duration: 500,
+          ease: "Power2",
+          onComplete: () => {
+            player.body.setSize(
+              player.displayWidth,
+              player.displayHeight,
+              true
+            );
+            resetPlayerPhysics(player);
+            player.unshrinkTimer = null;
+          },
+        });
+      } else {
+        player.unshrinkTimer = null;
+      }
+    });
+  } else if (isOnShrinkPlatform && player.unshrinkTimer) {
+    // Cancel timer if they step back on
+    player.unshrinkTimer.remove(false);
+    player.unshrinkTimer = null;
   }
+}
+
 
   function handleUnshrinkForPlayer(player, scene) {
     scene.platforms.getChildren().forEach(platform => {
