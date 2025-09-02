@@ -4,6 +4,7 @@ import p1Sprite from '../assets/p1sprite.png'
 import p2Sprite from '../assets/p2sprite.png'
 import p3Sprite from '../assets/p3sprite.png'
 import DownSplatLogo from '../assets/DownSplatlogo.png'
+import JumpIn from '../assets/jumpin.png'
 ---
 
 <div id="gameOverlay">
@@ -33,7 +34,8 @@ import DownSplatLogo from '../assets/DownSplatlogo.png'
   </div>
 
   <div class="init-wrapper">
-    <h3>Jump in!</h3>
+    <h3><Image src={JumpIn} alt="Jump in!" />
+      <span class="hidden">Jump in!</span></h3>
 <div class="player-button-wrapper">
 <button id="twoPlayer">Two Player</button>
 <button id="threePlayer">Three Player</button>
@@ -122,7 +124,7 @@ document.getElementById('playAgain')?.addEventListener("click", restartGame)
 
 <style>
 *{
-  color: white;
+  color: black;
 }
 .hidden{
 display: none;
@@ -191,8 +193,9 @@ display: none;
     width: 100px;
     background-color: darkviolet;
     border:1px solid black;
+    color: white;
     padding: 0.25rem 0.5rem;
-        cursor: pointer;
+    cursor: pointer;
 
   }
   
@@ -215,6 +218,7 @@ display: none;
     cursor: pointer;
     width: 100px;
     background-color: darkviolet;
+    color:white;
     border:1px solid black;
     padding: 0.25rem 0.5rem;
   }
