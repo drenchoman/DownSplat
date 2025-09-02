@@ -663,7 +663,14 @@ function handleUnshrink(player, shrinkPlatform, scene) {
     scene.physics.pause();
     
     let winner = allPlayers.filter(p => !deadCounter.includes(p))
-    gameWinner.set(winner[0])
+    let winnerName 
+  
+    if(typeof winner[0] === "string"){
+      winnerName = `${winner[0]} Wins!`
+    } else {
+      winnerName = 'Draw!'
+    }
+    gameWinner.set(winnerName)
     // player1.anims.pause(); 
     // player2.anims.pause();
 
