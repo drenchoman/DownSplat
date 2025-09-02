@@ -236,12 +236,10 @@ numberOfPlayers.subscribe(numOfPlayers => {
     p2Controls = this.input.keyboard.addKeys({
       left: Phaser.Input.Keyboard.KeyCodes.Z,
       right: Phaser.Input.Keyboard.KeyCodes.X,
-      up: Phaser.Input.Keyboard.KeyCodes.S,
     });
     p3Controls = this.input.keyboard.addKeys({
       left: Phaser.Input.Keyboard.KeyCodes.N,
       right: Phaser.Input.Keyboard.KeyCodes.M,
-      up: Phaser.Input.Keyboard.KeyCodes.J
     });
 
     // TEXT //
@@ -650,9 +648,7 @@ function handleUnshrink(player, shrinkPlatform, scene) {
       player.setVelocityX(0);
       player.anims.play('turn');
     }
-    if (controls.up.isDown && player.body.touching.down) {
-      player.setVelocityY(-330);
-    }
+  
   }
 
   handlePlayerControls(player1, p1Controls, player1Speed);
