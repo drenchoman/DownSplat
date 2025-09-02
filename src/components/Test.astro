@@ -3,10 +3,12 @@ import {Image} from 'astro:assets'
 import p1Sprite from '../assets/p1sprite.png'
 import p2Sprite from '../assets/p2sprite.png'
 import p3Sprite from '../assets/p3sprite.png'
+import DownSplatLogo from '../assets/DownSplatlogo.png'
 ---
 
 <div id="gameOverlay">
-  <h2 class="header">DownSplat</h2>
+  <h2 class="header"><Image src={DownSplatLogo} alt="DownSplat logo" />
+    <span class="hidden">DownSplat</span></h2>
   <div class="livesOverlay hide">
   <div class="player-one-lives">
     <span>P1 Lives <br/> <span class="p1-lives-text"></span></span>
@@ -121,6 +123,9 @@ document.getElementById('playAgain')?.addEventListener("click", restartGame)
 <style>
 *{
   color: white;
+}
+.hidden{
+display: none;
 }
   #gameOverlay{
     width: 800px;
