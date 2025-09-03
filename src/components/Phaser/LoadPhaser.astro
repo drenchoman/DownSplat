@@ -457,8 +457,10 @@ function handleUngrow(player, growPlatform, scene) {
               player.displayHeight,
               true
             );
+            player.setScale(1)
             resetPlayerPhysics(player);
             player.ungrowTimer = null; // clear ref
+            player.ungrowTimerStarted = false;
           },
         });
       } else {
@@ -512,8 +514,11 @@ function handleUnshrink(player, shrinkPlatform, scene) {
               player.displayHeight,
               true
             );
+            player.setScale(1)
             resetPlayerPhysics(player);
             player.unshrinkTimer = null;
+            player.unshrinkTimerStarted = false;
+          
           },
         });
       } else {
@@ -868,6 +873,8 @@ function handleUnshrink(player, shrinkPlatform, scene) {
           player.setSize(player.width, player.height, true);
           // player.body.setOffset(0, 0);
           player.unshrinkTimerStarted = false;
+          player.ungrowTimeStarted = false;
+
         },
       });
     }
