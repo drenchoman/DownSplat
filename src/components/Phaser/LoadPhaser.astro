@@ -659,39 +659,37 @@ function handleUnshrink(player, shrinkPlatform, scene) {
 
    
 
-  function setGameOver(scene) {
-    scene.physics.pause();
-    
-    let winner = allPlayers.filter(p => !deadCounter.includes(p))
-    let winnerName 
-  
-    if(typeof winner[0] === "string"){
-      winnerName = `${winner[0]} Wins!`
-    } else {
-      winnerName = 'Draw!'
-    }
-    gameWinner.set(winnerName)
-    // player1.anims.pause(); 
-    // player2.anims.pause();
+ function setGameOver(scene) {
+  if (scene.gameOverHandled) return; // ✅ prevent multiple calls
+  scene.gameOverHandled = true;
 
-    // Optional: Disable input
-    scene.add
-      .text(
-        scene.cameras.main.width / 2,
-        scene.cameras.main.height / 3,
-        'GAME OVER',
-        {
-          fontSize: '64px',
-          fill: '#ff0000',
-          fontStyle: 'bold',
-        }
-      )
-      .setOrigin(0.5); // center align
-      
-      // setTimeout(function(){gameFinished.set(true)}, 2000)
-     
+  scene.physics.pause();
 
+  let winner = allPlayers.filter(p => !deadCounter.includes(p));
+  let winnerName; 
+
+
+  if (typeof winner[0] === "string") {
+    winnerName = `${winner[0]} Wins!`;
+  } else {
+    winnerName = "Draw!";
   }
+  gameWinner.set(winnerName);
+
+  scene.add
+    .text(
+      scene.cameras.main.width / 2,
+      scene.cameras.main.height / 3,
+      "GAME OVER",
+      {
+        fontSize: "64px",
+        fill: "#ff0000",
+        fontStyle: "bold",
+      }
+    )
+    .setOrigin(0.5);
+}
+
 
 
 
